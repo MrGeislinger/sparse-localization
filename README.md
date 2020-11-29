@@ -27,3 +27,44 @@ Alternatively some scripts have been included to streamline this process, these 
 2. ./build.sh
 3. ./run.sh
 
+# Implementing the Particle Filter
+
+The directory structure of this repository is as follows:
+
+```
+root
+|   build.sh
+|   clean.sh
+|   CMakeLists.txt
+|   README.md
+|   run.sh
+|
+|___data
+|   |   
+|   |   map_data.txt
+|   
+|___src
+    |   helper_functions.h
+    |   main.cpp
+    |   map.h
+    |   particle_filter.cpp
+    |   particle_filter.h
+```
+
+
+## Inputs to the Particle Filter
+
+The inputs to the particle filter are in the `data` directory.
+
+#### The Map
+
+`map_data.txt` includes the position of landmarks (in meters) on an arbitrary Cartesian coordinate system. Each row has three columns:
+1. x position
+2. y position
+3. landmark id
+
+> Map data provided by 3D Mapping Solutions GmbH.
+
+### All Other Data (such as observations and controls)
+
+Provided by the simulator
