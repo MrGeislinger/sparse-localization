@@ -25,24 +25,33 @@ using std::normal_distribution;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
-   * TODO: Set the number of particles. Initialize all particles to 
+   * - Set the number of particles. Initialize all particles to 
    *   first position (based on estimates of x, y, theta and their uncertainties
    *   from GPS) and all weights to 1. 
-   * TODO: Add random Gaussian noise to each particle.
+   * - Add random Gaussian noise to each particle.
    */
   // Make sure we have enough particles implemented for state space
   num_particles = 1000;
   // Random engine initialized
   std::default_random_engine gen;
+
   // Will add noise to each particle based on Gaussian & std deviation given
   normal_distribution<double> dist_x(x, std[0]);
   normal_distribution<double> dist_y(y, std[1]);
   normal_distribution<double> dist_theta(theta, std[2]);
 
-  // TODO: Set each particle to the x,y coordinates and heading (theta)
-  // TODO: Set each weight to 1 (all equally likely)
-  // Note: sample_x = dist_x(gen);
-
+  // Set each particle to the x,y coordinates and heading (theta)
+  for (int i = 0; i < num_particles; i++) {
+    Particle p;
+    p.id = i;
+    p.x = dist_x(gen);
+    p.y = dist_y(gen);
+    p.theta = dist_theta(gen);
+    // Set each weight to 1 (all equally likely)
+    p.weight = 1.0;
+    // Add to list of all current particles
+    particles.push_back(p);
+  }
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], 
