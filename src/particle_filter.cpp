@@ -57,21 +57,28 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 void ParticleFilter::prediction(double delta_t, double std_pos[], 
                                 double velocity, double yaw_rate) {
   /**
-   * TODO: Add measurements to each particle and add random Gaussian noise.
-   * NOTE: When adding noise you may find std::normal_distribution 
-   *   and std::default_random_engine useful.
-   *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
-   *  http://www.cplusplus.com/reference/random/default_random_engine/
+   * Add measurements to each particle and add random Gaussian noise.
    */
   // Update the particles locations
   for (int i=0; i < num_particles; i++) {
-    //
     Particle p = particles[i];
+    // Default to no change (small change) in theta
+    double v_scaled = velocity;
+    double x_delta_by_theta = cos(p.theta);
+    double y_delta_by_theta = sin(p.theta);
+    // Check that yaw_rate isn't (near) zero (no spinning in theta)
+    if (fabs(yaw_rate) > 0.001) { //~0.05 degrees; small on short time scale
+      // Takes into the account the acceleration (change in theta)
+      v_scaled = velocity / yaw_rate;
+      x_delta_by_theta = sin(p.theta + yaw_rate*delta_t) - sin(p.theta);
+      y_delta_by_theta = cos(p.theta) - cos(p.theta + yaw_rate * delta_t);
+    } 
+    // Update after taking into account of theta
+    p.x = p.x + v_scaled * x_delta_by_theta;
+    p.y = p.y + v_scaled * y_delta_by_theta;
     p.theta = p.theta + yaw_rate*delta_t;
-    // TODO: Check if yaw_rate is zero (no spinning in theta)
-    double v_scaled = velocity / yaw_rate;
-    p.x = p.x + v_scaled * (sin(p.theta + yaw_rate*delta_t) - sin(p.theta));
-    p.y = p.y + v_scaled * (cos(p.theta) - cos(p.theta + yaw_rate*delta_t));
+    }
+    
 
     // Add noise directly to position & heading (yaw)
     // NOTE: In some cases, we could add noise directly to the velocities
