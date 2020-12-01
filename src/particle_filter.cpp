@@ -32,8 +32,6 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    */
   // Make sure we have enough particles implemented for state space
   num_particles = 1000;
-  // Random engine initialized
-  std::default_random_engine gen;
 
   // Will add noise to each particle based on Gaussian & std deviation given
   normal_distribution<double> dist_x(x, std[0]);
@@ -82,7 +80,6 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 
     // Add noise directly to position & heading (yaw)
     // NOTE: In some cases, we could add noise directly to the velocities
-    std::default_random_engine gen;
     std::normal_distribution<double> dist_x(p.x, std_pos[0]);
     std::normal_distribution<double> dist_y(p.y, std_pos[1]);
     std::normal_distribution<double> dist_theta(p.theta, std_pos[2]);
@@ -91,7 +88,6 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     p.theta = dist_theta(gen);
   }
   
-}
 
 void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted, 
                                      vector<LandmarkObs>& observations) {
