@@ -53,6 +53,9 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 
   // Initialize weights (stored separately from each particle); equally likely
    weights = vector<double>(num_particles, 1.0);
+  
+  // Update flag to signal initialization
+  is_initialized = true;
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], 
