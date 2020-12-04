@@ -133,7 +133,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const vector<LandmarkObs> &observations, 
                                    const Map &map_landmarks) {
   /**
-   * TODO: Update the weights of each particle using a mult-variate Gaussian 
+   * TODO: Update the weights of each particle using a multi-variate Gaussian 
    *   distribution. You can read more about this distribution here: 
    *   https://en.wikipedia.org/wiki/Multivariate_normal_distribution
    * NOTE: The observations are given in the VEHICLE'S coordinate system. 
@@ -145,6 +145,41 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
    *   and the following is a good resource for the actual equation to implement
    *   (look at equation 3.33) http://planning.cs.uiuc.edu/node99.html
    */
+  // Repeat process for each particle
+  for (int i=0; i < num_particles; i++) {
+    Particle p = particles[i];
+
+    // Iterate over each landmark to ensure its within range
+    vector<LandmarkObs> possible_predictions;
+    for (unsigned int j = 0; j < map_landmarks.landmark_list.size(); j++) {
+      // Get the landmark coordinates to make life easier
+      float lm_x = map_landmarks.landmark_list[j].x_f;
+      float lm_y = map_landmarks.landmark_list[j].y_f;
+      int lm_id = map_landmarks.landmark_list[j].id_i;
+
+      // Only look at landmarks within the sensor range of the particle
+      // TODO: Consider making more efficient by looking at just x&y (square)
+      double dist_to_landmark = dist(p.x, p.y, lm_x, lm_y);
+      if (dist_to_landmark < sensor_range) { 
+        // Add to possible prediction
+        possible_predictions.push_back(LandmarkObs{lm_id, lm_x, lm_y});
+      }
+    }
+
+    // Transformed observations list to later associate with probable landmarks
+    vector<LandmarkObs> observations_trans;
+    for (unsigned int j = 0; j < observations.size(); j++) {
+      LandmarkObs obs = observations[j];
+      double obs_tx = cos(p.theta)*obs.x - sin(p.theta)*obs.y + p.x;
+      double obs_ty = sin(p.theta)*obs.x + cos(p.theta)*obs.y + p.y;
+      observations_trans.push_back(LandmarkObs{obs.id, obs_tx, obs_ty});
+    }
+
+    // Find the associated landmark from map's coordinate system of observations
+    dataAssociation(possible_predictions, observations_trans);
+  }
+
+  
 
 }
 
