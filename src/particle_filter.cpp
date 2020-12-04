@@ -151,7 +151,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
     // Iterate over each landmark to ensure its within range
     vector<LandmarkObs> possible_predictions;
-    for (unsigned int j = 0; j < map_landmarks.landmark_list.size(); j++) {
+    for (int j=0; j < map_landmarks.landmark_list.size(); j++) {
       // Get the landmark coordinates to make life easier
       float lm_x = map_landmarks.landmark_list[j].x_f;
       float lm_y = map_landmarks.landmark_list[j].y_f;
@@ -168,8 +168,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
     // Transformed observations list to later associate with probable landmarks
     vector<LandmarkObs> observations_trans;
-    for (unsigned int j = 0; j < observations.size(); j++) {
-      LandmarkObs obs = observations[j];
+    for (int k=0; k < observations.size(); k++) {
+      LandmarkObs obs = observations[k];
       double obs_tx = cos(p.theta)*obs.x - sin(p.theta)*obs.y + p.x;
       double obs_ty = sin(p.theta)*obs.x + cos(p.theta)*obs.y + p.y;
       observations_trans.push_back(LandmarkObs{obs.id, obs_tx, obs_ty});
@@ -177,6 +177,36 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
     // Find the associated landmark from map's coordinate system of observations
     dataAssociation(possible_predictions, observations_trans);
+    
+    // Find the correct prediction for observation
+    double p_weight;
+    for (int o=0; o < observations_trans.size(); o++) {
+      LandmarkObs obs_trans = observations_trans[o];
+      LandmarkObs pred;
+      // Get the landmark associated with observation
+      for (int j=0; j < possible_predictions.size(); j++) {
+        if (possible_predictions[j].id == obs_trans.id) {
+          pred = possible_predictions[j];
+          break;
+        }
+      }
+
+      // Update weight using PDF based on predicted landmarks
+      p_weight = 1.0;
+      double obs_w = 
+        1.0 / (2.0 * M_PI * std_landmark[0] * std_landmark[1]) 
+        * 
+        exp( -(
+          pow(pred.x - obs_trans.x,2) / (2*pow(std_landmark[0],2)) 
+          + 
+          pow(pred.y - obs_trans.y,2) / (2*pow(std_landmark[1],2))
+        ));
+
+      // product of this obersvation weight with total observations weight
+      p_weight *= obs_w;
+    }
+    weights[i] = p_weight;
+    particles[i].weight = p_weight;
   }
 
   
