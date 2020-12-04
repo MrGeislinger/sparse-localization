@@ -82,9 +82,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     p.x = p.x + v_scaled * x_delta_by_theta;
     p.y = p.y + v_scaled * y_delta_by_theta;
     p.theta = p.theta + yaw_rate*delta_t;
-    }
     
-
     // Add noise directly to position & heading (yaw)
     // NOTE: In some cases, we could add noise directly to the velocities
     std::normal_distribution<double> dist_x(p.x, std_pos[0]);
@@ -94,6 +92,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     p.y = dist_y(gen);
     p.theta = dist_theta(gen);
   }
+}
 
 void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted, 
                                      vector<LandmarkObs> &observations) {
