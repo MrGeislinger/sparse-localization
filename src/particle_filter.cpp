@@ -21,6 +21,7 @@
 using std::string;
 using std::vector;
 using std::normal_distribution;
+using std::numeric_limits;
 
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
@@ -95,9 +96,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
   }
 
 void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted, 
-                                     vector<LandmarkObs>& observations) {
+                                     vector<LandmarkObs> &observations) {
   /**
-   * TODO: Find the predicted measurement that is closest to each 
+   * Find the predicted measurement that is closest to each 
    *   observed measurement and assign the observed measurement to this 
    *   particular landmark.
    * NOTE: this method will NOT be called by the grading code. But you will 
@@ -105,6 +106,27 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   during the updateWeights phase.
    */
 
+  // Iterate over each observation and compare each landmark (predicted)
+  double distance;
+  double min_distance;
+  int landmark_id;
+  for (int o=0; o < observations.size(); o++) {
+    LandmarkObs observation = observations[o];
+    // Initialize a maximum to compare for the observation (always does the 1st)
+    min_distance = numeric_limits<double>::max();
+    // Iterate over each landmark to find closest
+    for (int p=0; p < predicted.size(); p++) {
+      LandmarkObs landmark = predicted[p];
+      //Find the distance to landmark from observation
+      distance = dist(observation.x, observation.y, landmark.x, landmark.y);
+      // If shortest distance so far, save the id for the observation
+      // Note that a tie for shortest goes to the first one found
+      if (distance < min_distance) {
+        min_distance = distance;
+        landmark_id = landmark.id;
+      }
+    }
+  }
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
@@ -145,7 +167,7 @@ void ParticleFilter::SetAssociations(Particle& particle,
   // associations: The landmark id that goes along with each listed association
   // sense_x: the associations x mapping already converted to world coordinates
   // sense_y: the associations y mapping already converted to world coordinates
-  particle.associations= associations;
+  particle.associations = associations;
   particle.sense_x = sense_x;
   particle.sense_y = sense_y;
 }
