@@ -22,6 +22,8 @@ using std::string;
 using std::vector;
 using std::normal_distribution;
 using std::numeric_limits;
+using std::uniform_real_distribution;
+using std::max_element;
 
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
@@ -132,7 +134,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
                                    const vector<LandmarkObs> &observations, 
                                    const Map &map_landmarks) {
   /**
-   * TODO: Update the weights of each particle using a multi-variate Gaussian 
+   * Update the weights of each particle using a multi-variate Gaussian 
    *   distribution. You can read more about this distribution here: 
    *   https://en.wikipedia.org/wiki/Multivariate_normal_distribution
    * NOTE: The observations are given in the VEHICLE'S coordinate system. 
@@ -214,12 +216,36 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 void ParticleFilter::resample() {
   /**
-   * TODO: Resample particles with replacement with probability proportional 
+   * Resample particles with replacement with probability proportional 
    *   to their weight. 
    * NOTE: You may find std::discrete_distribution helpful here.
    *   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
    */
 
+  // Only use weights with the given range
+  double weight_max = *max_element(weights.begin(), weights.end());
+  // Pick a random particle to start from
+  int index = rand() % num_particles;
+  // Keep track of where you are in the cycle
+  double beta = 0.0;
+  // Uniformly random value
+  uniform_real_distribution<double> dist_0_1(0.0, 1.0);
+  
+  // Go around the wheel/cycle to get new particles
+  // Weights determine the size/area to take up to be resampled
+  vector<Particle> new_particles;
+  for (int i=0; i < num_particles; i++) {
+    // Have to move "beta" more to get to next particle
+    beta += dist_0_1(gen) * 2.0 * weight_max;
+    // Move around until we hit the final weight index
+    while(beta > weights[index]) {
+      beta -= weights[index];
+      index = (index + 1) % num_particles;
+    }
+    new_particles.push_back(particles[index]);
+  }
+  // Set the new particles to be the next particlees to use
+  particles = new_particles;
 }
 
 void ParticleFilter::SetAssociations(Particle& particle, 
