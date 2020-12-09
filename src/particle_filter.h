@@ -89,7 +89,7 @@ class ParticleFilter {
    * Set a particles list of associations, along with the associations'
    *   calculated world x,y coordinates
    * This can be a very useful debugging tool to make sure transformations 
-   *   are correct and assocations correctly connected
+   *   are correct and associations correctly connected
    */
   void SetAssociations(Particle& particle, const std::vector<int>& associations,
                        const std::vector<double>& sense_x, 
@@ -120,6 +120,9 @@ class ParticleFilter {
   
   // Vector of weights of all particles
   std::vector<double> weights; 
+  
+  // Random engine initialized
+  std::default_random_engine gen;
 };
 
 #endif  // PARTICLE_FILTER_H_
