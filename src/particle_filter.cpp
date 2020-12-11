@@ -25,6 +25,8 @@ using std::numeric_limits;
 using std::uniform_real_distribution;
 using std::max_element;
 
+// Random engine initialized
+static std::default_random_engine gen;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
