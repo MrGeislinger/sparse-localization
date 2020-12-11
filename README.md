@@ -5,6 +5,9 @@
 > Your robot has been kidnapped and transported to a new location! Luckily it has a map of this location, a (noisy) GPS estimate of its initial location, and lots of (noisy) sensor and control data.
 > In this project, a 2-dimensional particle filter is implemented in C++. The particle filter will be given a map and some initial localization information (analogous to what a GPS would provide). At each time step the filter will also get observation and control data.
 
+![GIF of car run simulation](images/sim_run.gif)
+> Example run of a simulation map and landmarks for a car. Black circles with crosses are landmarks, green lines are sensor readings, blue circle (mostly under car) is the estimated best direction and position of the car. Note how the blue circle is approximately at the same position of the car the entire run.
+
 ## Set Up
 
 This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases)
