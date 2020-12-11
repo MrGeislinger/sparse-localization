@@ -25,6 +25,8 @@ using std::numeric_limits;
 using std::uniform_real_distribution;
 using std::max_element;
 
+// Random engine initialized
+static std::default_random_engine gen;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
@@ -55,7 +57,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   }
 
   // Initialize weights (stored separately from each particle); equally likely
-   weights = vector<double>(num_particles, 1.0);
+  weights = vector<double>(num_particles, 1.0);
   
   // Update flag to signal initialization
   is_initialized = true;
@@ -71,28 +73,28 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     Particle p = particles[i];
     // Default to no change (small change) in theta
     double v_scaled = velocity;
-    double x_delta_by_theta = cos(p.theta);
-    double y_delta_by_theta = sin(p.theta);
+    double x_delta_by_theta = cos(p.theta) * delta_t;
+    double y_delta_by_theta = sin(p.theta) * delta_t;
     // Check that yaw_rate isn't (near) zero (no spinning in theta)
-    if (fabs(yaw_rate) > 0.001) { //~0.05 degrees; small on short time scale
+    if (fabs(yaw_rate) > 0.00001) { //~0.0005 degrees; small on short time scale
       // Takes into the account the acceleration (change in theta)
       v_scaled = velocity / yaw_rate;
       x_delta_by_theta = sin(p.theta + yaw_rate*delta_t) - sin(p.theta);
       y_delta_by_theta = cos(p.theta) - cos(p.theta + yaw_rate * delta_t);
     } 
     // Update after taking into account of theta
-    p.x = p.x + v_scaled * x_delta_by_theta;
-    p.y = p.y + v_scaled * y_delta_by_theta;
-    p.theta = p.theta + yaw_rate*delta_t;
+    particles[i].x = p.x + v_scaled * x_delta_by_theta;
+    particles[i].y = p.y + v_scaled * y_delta_by_theta;
+    particles[i].theta = p.theta + yaw_rate*delta_t;
     
     // Add noise directly to position & heading (yaw)
     // NOTE: In some cases, we could add noise directly to the velocities
-    std::normal_distribution<double> dist_x(p.x, std_pos[0]);
-    std::normal_distribution<double> dist_y(p.y, std_pos[1]);
-    std::normal_distribution<double> dist_theta(p.theta, std_pos[2]);
-    p.x = dist_x(gen);
-    p.y = dist_y(gen);
-    p.theta = dist_theta(gen);
+    std::normal_distribution<double> dist_x(particles[i].x, std_pos[0]);
+    std::normal_distribution<double> dist_y(particles[i].y, std_pos[1]);
+    std::normal_distribution<double> dist_theta(particles[i].theta, std_pos[2]);
+    particles[i].x = dist_x(gen);
+    particles[i].y = dist_y(gen);
+    particles[i].theta = dist_theta(gen);
   }
 }
 
@@ -127,6 +129,8 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
         landmark_id = landmark.id;
       }
     }
+
+    observations[o].id = landmark_id;
   }
 }
 
