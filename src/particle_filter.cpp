@@ -57,7 +57,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   }
 
   // Initialize weights (stored separately from each particle); equally likely
-   weights = vector<double>(num_particles, 1.0);
+  weights = vector<double>(num_particles, 1.0);
   
   // Update flag to signal initialization
   is_initialized = true;
@@ -73,10 +73,10 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
     Particle p = particles[i];
     // Default to no change (small change) in theta
     double v_scaled = velocity;
-    double x_delta_by_theta = cos(p.theta);
-    double y_delta_by_theta = sin(p.theta);
+    double x_delta_by_theta = cos(p.theta) * delta_t;
+    double y_delta_by_theta = sin(p.theta) * delta_t;
     // Check that yaw_rate isn't (near) zero (no spinning in theta)
-    if (fabs(yaw_rate) > 0.001) { //~0.05 degrees; small on short time scale
+    if (fabs(yaw_rate) > 0.00001) { //~0.0005 degrees; small on short time scale
       // Takes into the account the acceleration (change in theta)
       v_scaled = velocity / yaw_rate;
       x_delta_by_theta = sin(p.theta + yaw_rate*delta_t) - sin(p.theta);
