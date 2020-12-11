@@ -83,18 +83,18 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
       y_delta_by_theta = cos(p.theta) - cos(p.theta + yaw_rate * delta_t);
     } 
     // Update after taking into account of theta
-    p.x = p.x + v_scaled * x_delta_by_theta;
-    p.y = p.y + v_scaled * y_delta_by_theta;
-    p.theta = p.theta + yaw_rate*delta_t;
+    particles[i].x = p.x + v_scaled * x_delta_by_theta;
+    particles[i].y = p.y + v_scaled * y_delta_by_theta;
+    particles[i].theta = p.theta + yaw_rate*delta_t;
     
     // Add noise directly to position & heading (yaw)
     // NOTE: In some cases, we could add noise directly to the velocities
-    std::normal_distribution<double> dist_x(p.x, std_pos[0]);
-    std::normal_distribution<double> dist_y(p.y, std_pos[1]);
-    std::normal_distribution<double> dist_theta(p.theta, std_pos[2]);
-    p.x = dist_x(gen);
-    p.y = dist_y(gen);
-    p.theta = dist_theta(gen);
+    std::normal_distribution<double> dist_x(particles[i].x, std_pos[0]);
+    std::normal_distribution<double> dist_y(particles[i].y, std_pos[1]);
+    std::normal_distribution<double> dist_theta(particles[i].theta, std_pos[2]);
+    particles[i].x = dist_x(gen);
+    particles[i].y = dist_y(gen);
+    particles[i].theta = dist_theta(gen);
   }
 }
 
