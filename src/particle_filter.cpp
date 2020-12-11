@@ -129,6 +129,8 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
         landmark_id = landmark.id;
       }
     }
+
+    observations[o].id = landmark_id;
   }
 }
 
